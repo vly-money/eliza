@@ -50,10 +50,22 @@ Thread of Tweets You Are Replying To:
 # Task: Generate a post in the voice, style and perspective of {{agentName}} (@{{twitterUserName}}). You MUST include an action if the current post text includes a prompt that is similar to one of the available actions mentioned here:
 {{actionNames}}
 Here is the current post text again. Remember to include an action if the current post text includes a prompt that asks for one of the available actions mentioned above (does not need to be exact)
-{{currentPost}}
-` + messageCompletionFooter;
+{{currentPost}}`
 
-export const twitterShouldRespondTemplate = (targetUsersStr: string) => 
++
+`\nGenerate a random_tipping_message using one of these variations or similar:
+ \n- "I'll tip you some sol, check https://vly.money"
+ \n- "Tipping sol your way via https://vly.money"
+ \n- "Here's some sol for you at https://vly.money"
+ \n- "Got a sol tip for you on https://vly.money"
+ \n- "Check https://vly.money for your sol tip"
+ \nResponse format should be formatted in a JSON block like this:\njson\n{ \"user\": \"{{agentName}}\", \"text\": \"string + ' | ' + [random_tipping_message]\", \"action\": \"string\" }\n;
+`;
+// + messageCompletionFooter;
+
+
+
+export const twitterShouldRespondTemplate = (targetUsersStr: string) =>
     `# INSTRUCTIONS: Determine if {{agentName}} (@{{twitterUserName}}) should respond to the message and participate in the conversation. Do not comment. Just respond with "true" or "false".
 
 Response options are RESPOND, IGNORE and STOP.
@@ -133,7 +145,7 @@ export class TwitterInteractionClient {
             .filter(u => u.length > 0); // Filter out empty strings after split
 
         elizaLogger.log("Processing target users:", TARGET_USERS);
-    
+
         if (TARGET_USERS.length > 0) {
             // Create a map to store tweets by user
             const tweetsByUser = new Map<string, Tweet[]>();
@@ -142,24 +154,24 @@ export class TwitterInteractionClient {
             for (const username of TARGET_USERS) {
                 try {
                     const userTweets = (await this.client.twitterClient.fetchSearchTweets(
-                        `from:${username}`,  
-                        3,                   
-                        SearchMode.Latest    
+                        `from:${username}`,
+                        3,
+                        SearchMode.Latest
                     )).tweets;
 
                 // Filter for unprocessed, non-reply, recent tweets
                 const validTweets = userTweets.filter(tweet => {
-                    const isUnprocessed = !this.client.lastCheckedTweetId || 
+                    const isUnprocessed = !this.client.lastCheckedTweetId ||
                                         parseInt(tweet.id) > this.client.lastCheckedTweetId;
                     const isRecent = (Date.now() - (tweet.timestamp * 1000)) < 2 * 60 * 60 * 1000;
-                    
+
                     elizaLogger.log(`Tweet ${tweet.id} checks:`, {
                         isUnprocessed,
                         isRecent,
                         isReply: tweet.isReply,
                         isRetweet: tweet.isRetweet
                     });
-                    
+
                     return isUnprocessed && !tweet.isReply && !tweet.isRetweet && isRecent;
                 });
 
@@ -191,7 +203,7 @@ export class TwitterInteractionClient {
     elizaLogger.log("No target users configured, processing only mentions");
     }
 
-  
+
 
             // Sort tweet candidates by ID in ascending order
             uniqueTweetCandidates
@@ -359,17 +371,17 @@ export class TwitterInteractionClient {
         const targetUsersStr = this.runtime.getSetting("TWITTER_TARGET_USERS");
 
         // 2. Process the string to get valid usernames
-        const validTargetUsersStr = targetUsersStr && targetUsersStr.trim() 
+        const validTargetUsersStr = targetUsersStr && targetUsersStr.trim()
             ? targetUsersStr.split(',')          // Split by commas: "user1,user2" -> ["user1", "user2"]
             .map(u => u.trim())              // Remove whitespace: [" user1 ", "user2 "] -> ["user1", "user2"]
-            .filter(u => u.length > 0)       
-            .join(',')                       
-            : '';    
+            .filter(u => u.length > 0)
+            .join(',')
+            : '';
 
         const shouldRespondContext = composeContext({
             state,
-            template: this.runtime.character.templates?.twitterShouldRespondTemplate?.(validTargetUsersStr) || 
-                     this.runtime.character?.templates?.shouldRespondTemplate || 
+            template: this.runtime.character.templates?.twitterShouldRespondTemplate?.(validTargetUsersStr) ||
+                     this.runtime.character?.templates?.shouldRespondTemplate ||
                      twitterShouldRespondTemplate(validTargetUsersStr),
         });
 
@@ -394,13 +406,15 @@ export class TwitterInteractionClient {
                 twitterMessageHandlerTemplate,
         });
 
-        elizaLogger.debug("Interactions prompt:\n" + context);
+        elizaLogger.log("Interactions prompt:\n" + context);
 
         const response = await generateMessageResponse({
             runtime: this.runtime,
             context,
             modelClass: ModelClass.MEDIUM,
         });
+
+
 
         const removeQuotes = (str: string) =>
             str.replace(/^['"](.*)['"]$/, "$1");
@@ -410,6 +424,8 @@ export class TwitterInteractionClient {
         response.inReplyTo = stringId;
 
         response.text = removeQuotes(response.text);
+
+        elizaLogger.log("Interactions prompt response:\n" + response.text);
 
         if (response.text) {
             try {
@@ -445,6 +461,9 @@ export class TwitterInteractionClient {
                 }
 
 
+                elizaLogger.debug("Processing actions");
+                elizaLogger.debug("message", JSON.stringify(message));
+                elizaLogger.debug("responseMessages", JSON.stringify(responseMessages));
                 await this.runtime.processActions(
                     message,
                     responseMessages,

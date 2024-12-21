@@ -9,6 +9,7 @@ import { DEFAULT_MAX_TWEET_LENGTH } from "./environment";
 export const wait = (minTime: number = 1000, maxTime: number = 3000) => {
     const waitTime =
         Math.floor(Math.random() * (maxTime - minTime + 1)) + minTime;
+    elizaLogger.log("Waiting for", waitTime, "ms");
     return new Promise((resolve) => setTimeout(resolve, waitTime));
 };
 
