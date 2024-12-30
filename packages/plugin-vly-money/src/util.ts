@@ -21,7 +21,11 @@ export const transferSOL = async (recipient: string, amount: number) => {
   // 使用私钥创建一个 Keypair 对象
   const senderKeypair = Keypair.fromSecretKey(secretKey);
 
-  const connection = new Connection("https://rpc.ankr.com/solana_devnet", {
+  // const url = "https://rpc.ankr.com/solana_devnet";
+  const url =
+    "https://skilled-muddy-water.solana-mainnet.quiknode.pro/a97f07b12a58eb78c883988b29b0ec46df918b40";
+
+  const connection = new Connection(url, {
     commitment: "processed",
   });
 

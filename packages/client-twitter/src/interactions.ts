@@ -406,7 +406,7 @@ export class TwitterInteractionClient {
                 twitterMessageHandlerTemplate,
         });
 
-        elizaLogger.log("Interactions prompt:\n" + context);
+        // elizaLogger.log("Interactions prompt:\n" + context);
 
         const response = await generateMessageResponse({
             runtime: this.runtime,

@@ -79,11 +79,12 @@ const fetchVlyWalletAddress: Action = {
 
             const params = new URLSearchParams({
                 chain: 'solana',
-                name: 'CMarshal247',
+                // name: 'whgreate',
+                name: user.username,
                 scope: 'twitter'
             });
 
-            elizaLogger.log("Fetching wallet address from VLY Money API");
+            elizaLogger.log("Fetching wallet address from VLY Money API: ", user.username);
             const response = await fetch(`${url}?${params}`, {
                 method: 'GET',
                 headers: {
@@ -97,10 +98,13 @@ const fetchVlyWalletAddress: Action = {
 
             const data = await response.json();
             elizaLogger.log("Successfully fetched wallet address from VLY Money");
-            elizaLogger.log(JSON.stringify(data));
+            const address = data.data.address;
+            elizaLogger.log(JSON.stringify(address));
 
-            await transferSOL("2AyTuJkEEsF83ZujhXXzXeiXNtoyZ2Dnyf5T4bFiF4XG", 0.01);
-            elizaLogger.log("Successfully transferred SOL to wallet address");
+            // await transferSOL("2AyTuJkEEsF83ZujhXXzXeiXNtoyZ2Dnyf5T4bFiF4XG", 0.001);
+            await transferSOL(address, 0.001);
+
+            elizaLogger.log("Successfully transferred SOL to wallet address: ", address);
 
             if(!callback) {
                 elizaLogger.log("No Callback.");
@@ -139,7 +143,7 @@ const fetchVlyWalletAddress: Action = {
             {
                 user: "{{agentName}}",
                 content: {
-                    text: "Solana blockchain is unique because it has a high throughput and low cost. Since you mentioned it, I'm going to tip you 0.01 SOL.",
+                    text: "Solana blockchain is unique because it has a high throughput and low cost. Since you mentioned it, I'm going to tip you 0.001 SOL.",
                     action: "TIP_SOLANA_TOKEN",
                 },
             },
@@ -149,7 +153,7 @@ const fetchVlyWalletAddress: Action = {
 
 export const vlyMoneyPlugin: Plugin = {
     name: "vlyMoney",
-    description: "distribute 0.01 solana token to the user when talking about solana blockchain topic",
+    description: "distribute 0.001 solana token to the user when talking about solana blockchain topic",
     actions: [fetchVlyWalletAddress],
     evaluators: [],
     providers: [],
