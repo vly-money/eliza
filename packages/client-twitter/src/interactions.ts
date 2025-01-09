@@ -53,13 +53,9 @@ Here is the current post text again. Remember to include an action if the curren
 {{currentPost}}`
 
 +
-`\nGenerate a random_tipping_message using one of these variations or similar:
- \n- "I'll tip you some sol, check https://vly.money"
- \n- "Tipping sol your way via https://vly.money"
- \n- "Here's some sol for you at https://vly.money"
- \n- "Got a sol tip for you on https://vly.money"
- \n- "Check https://vly.money for your sol tip"
- \nResponse format should be formatted in a JSON block like this:\njson\n{ \"user\": \"{{agentName}}\", \"text\": \"string + ' | ' + [random_tipping_message]\", \"action\": \"string\" }\n;
+`\nGenerate a send_like_token_msg message using one of these variations or similar:
+ \n- "successfuly sent like token to {{agentName}}"
+ \nResponse format should be formatted in a JSON block like this:\njson\n{ \"user\": \"{{agentName}}\", \"text\": \"string\", \"action\": \"string\" }\n;
 `;
 // + messageCompletionFooter;
 
