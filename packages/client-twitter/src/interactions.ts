@@ -54,7 +54,7 @@ Here is the current post text again. Remember to include an action if the curren
 
 +
 `\nGenerate a send_like_token_msg message using one of these variations or similar:
- \n- "successfuly sent like token to {{agentName}}"
+ \n- "Sending like token to {{agentName}} ..."
  \nResponse format should be formatted in a JSON block like this:\njson\n{ \"user\": \"{{agentName}}\", \"text\": \"string\", \"action\": \"string\" }\n;
 `;
 // + messageCompletionFooter;

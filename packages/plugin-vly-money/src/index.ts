@@ -111,9 +111,14 @@ const fetchVlyWalletAddress: Action = {
             const toAddress = await getVlyWalletAddress(content.twitter);
             elizaLogger.log("2. to wallet address from VLY API: ",JSON.stringify(toAddress));
 
+            // const ai_agent = "xij6f-56o6u-xqu76-72jah-hhh3v-aeez2-za224-m3h4m-2mmc5-4jczg-nqe";
+            const ai_agent = "w7dxv-ua6zz-y7qtd-d5a5s-qgj25-s5olo-oxkqd-ip2fk-eipxk-vbawa-lqe";
+
+            // const temp = "52fy7-5kml7-hjgrz-d72u7-qvfeo-ymhfu-x64dd-et7gi-brwca-3hp55-qae";
+            // const temp =  "522gs-pobxt-7gqj6-cralm-ttuhd-5uoor-zse6e-wo6eu-ebg5d-fzzqb-iae";
             const allowance = await check_allowance(
-                "xij6f-56o6u-xqu76-72jah-hhh3v-aeez2-za224-m3h4m-2mmc5-4jczg-nqe",
-                 "2korn-4ayqs-claq2-n7i4i-6gjxc-dej5x-do2cv-jy32n-5225d-pt5nw-7qe");
+                ai_agent,
+                 fromAddress);
             elizaLogger.log("allowance:", JSON.stringify(allowance,
                 (key, value) =>
                     typeof value === 'bigint' ? value.toString() : value
@@ -121,8 +126,9 @@ const fetchVlyWalletAddress: Action = {
 
             const amount = Number(content.amount) * 1_000_000; // 结果: 30000
 
+            // "2korn-4ayqs-claq2-n7i4i-6gjxc-dej5x-do2cv-jy32n-5225d-pt5nw-7qe"
             await transferFrom(
-                "2korn-4ayqs-claq2-n7i4i-6gjxc-dej5x-do2cv-jy32n-5225d-pt5nw-7qe",
+                fromAddress,
                 toAddress, amount);
 
             elizaLogger.log("Successfully transferred LIKE token to wallet address: ", toAddress);
@@ -174,7 +180,9 @@ const fetchVlyWalletAddress: Action = {
 
 async function getVlyWalletAddress(username: string) {
     const secretToken = process.env.VLY_MONEY_API_KEY;
-    const url = 'https://service.vly.money/api/third_party/user_mapping';
+    // const url = 'https://service.vly.money/api/third_party/user_mapping';
+
+    const url = 'https://swifty-service.zkid.xyz/api/third_party/user_mapping';
 
     const params = new URLSearchParams({
         chain: 'icp',
@@ -184,7 +192,8 @@ async function getVlyWalletAddress(username: string) {
     const response = await fetch(`${url}?${params}`, {
         method: 'GET',
         headers: {
-            'secret-token': secretToken
+            // 'secret-token': secretToken
+            'secret-token': 'zdpr02etnO2pzfVvoAMGtV7TpYykGQFB'
         }
     });
 
